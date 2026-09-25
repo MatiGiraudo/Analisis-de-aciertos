@@ -12,7 +12,12 @@ import { BarraFiltros } from '@/features/aciertos/ui/BarraFiltros';
 import { useCatalogoStore } from '@/features/catalogo/store/useCatalogoStore';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
 import { formatearEntero } from '@/shared/formato/numeros';
+import { paginar } from '@/shared/logic/paginar';
+import { Paginacion } from '@/shared/ui/Paginacion';
 import { Segmento } from '@/shared/ui/Segmento';
+
+const TELAS_POR_PAGINA = 25;
+const ANCLA = 'lista-ranking';
 
 export function RankingPage() {
   const catalogo = useCatalogoStore((s) => s.catalogo);
@@ -34,8 +39,7 @@ export function RankingPage() {
 
   if (!catalogo) return null;
 
-  const mostradas = filas.slice(0, f.limiteRanking);
-  const restantes = filas.length - mostradas.length;
+  const pagina = paginar(filas, f.paginaRanking, TELAS_POR_PAGINA);
 
   const q = f.q.trim().toLowerCase();
   const estaAbierta = (nombre: string) => abiertas.get(nombre) ?? (!!q && !nombre.toLowerCase().includes(q));
@@ -63,10 +67,10 @@ export function RankingPage() {
         <p className="max-w-[56ch] text-[12.5px] text-ink-2">{EXPLICACION_RANKING[f.modoRanking]}</p>
       </div>
 
-      <div className="my-3">
+      <div id={ANCLA} className="my-3 scroll-mt-4">
         <BarraFiltros
           mostrarOrden={false}
-          conteo={`${formatearEntero(mostradas.length)} de ${formatearEntero(filas.length)} telas`}
+          conteo={`${formatearEntero(filas.length)} telas`}
         />
       </div>
 
@@ -74,11 +78,11 @@ export function RankingPage() {
         <div className="px-2 py-11 text-center text-[14px] text-ink-3">Ninguna tela coincide con el filtro.</div>
       ) : (
         <ol className="m-0 list-none p-0">
-          {mostradas.map((item, i) => (
+          {pagina.items.map((item, i) => (
             <FilaRankingTela
               key={item.tela.nombre}
               item={item}
-              posicion={i + 1}
+              posicion={pagina.desde + i}
               modo={f.modoRanking}
               abierta={estaAbierta(item.tela.nombre)}
               onAlternar={() => alternar(item.tela.nombre)}
@@ -87,15 +91,7 @@ export function RankingPage() {
         </ol>
       )}
 
-      {restantes > 0 && (
-        <button
-          type="button"
-          onClick={f.verMasRanking}
-          className="mt-4 block w-full border border-dashed border-rule bg-panel p-3 text-[13px] text-ink-2 hover:border-ink hover:text-ink"
-        >
-          Ver {formatearEntero(Math.min(40, restantes))} más ({formatearEntero(restantes)} restantes)
-        </button>
-      )}
+      <Paginacion pagina={pagina} sustantivo="telas" onCambiar={f.setPaginaRanking} anclaId={ANCLA} />
     </div>
   );
 }

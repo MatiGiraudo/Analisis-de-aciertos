@@ -4,7 +4,7 @@
  * Reemplaza al objeto `state` mutable global del HTML original. Centraliza lo que
  * el usuario elige (búsqueda, unidad, orden, recomendación, moneda, etc.) para
  * que cualquier vista lo consuma sin prop-drilling. Cada setter que cambia el
- * conjunto de filas resetea los límites de paginación.
+ * conjunto de filas vuelve las vistas afectadas a la página 1.
  */
 import { create } from 'zustand';
 import type { Recomendacion, Rotacion } from '../model/tipos';
@@ -29,17 +29,19 @@ interface FiltrosState {
   recomendacion: Recomendacion | null;
   // --- tablas de aciertos ---
   orden: OrdenTabla;
-  limiteTabla: number;
+  paginaTabla: number;
   // --- ranking ---
   modoRanking: ModoRanking;
   alcanceRanking: AlcanceRanking;
-  limiteRanking: number;
+  paginaRanking: number;
   // --- precios ---
   moneda: Moneda;
   alcancePrecios: AlcancePrecios;
   ordenPrecios: OrdenPrecios;
   volumenMin: number;
-  limitePrecios: number;
+  paginaPrecios: number;
+  // --- colores de tendencia ---
+  paginaTendencias: number;
 
   setQ: (q: string) => void;
   setUnidad: (u: Unidad | '') => void;
@@ -47,26 +49,24 @@ interface FiltrosState {
   setRotacion: (r: Rotacion | '') => void;
   toggleRecomendacion: (r: Recomendacion) => void;
   setOrden: (o: OrdenTabla) => void;
-  verMasTabla: () => void;
+  setPaginaTabla: (p: number) => void;
   setModoRanking: (m: ModoRanking) => void;
   setAlcanceRanking: (a: AlcanceRanking) => void;
-  verMasRanking: () => void;
+  setPaginaRanking: (p: number) => void;
   setMoneda: (m: Moneda) => void;
   setAlcancePrecios: (a: AlcancePrecios) => void;
   setOrdenPrecios: (o: OrdenPrecios) => void;
   setVolumenMin: (v: number) => void;
-  verMasPrecios: () => void;
+  setPaginaPrecios: (p: number) => void;
+  setPaginaTendencias: (p: number) => void;
 }
 
-const LIMITE_TABLA = 120;
-const LIMITE_RANKING = 40;
-const LIMITE_PRECIOS = 100;
-
-/** Al cambiar un filtro, se reinician los límites de paginación de todas las vistas. */
-const RESET_LIMITES = {
-  limiteTabla: LIMITE_TABLA,
-  limiteRanking: LIMITE_RANKING,
-  limitePrecios: LIMITE_PRECIOS,
+/** Al cambiar un filtro compartido, todas las vistas vuelven a la página 1. */
+const RESET_PAGINAS = {
+  paginaTabla: 1,
+  paginaRanking: 1,
+  paginaPrecios: 1,
+  paginaTendencias: 1,
 };
 
 export const useFiltrosStore = create<FiltrosState>((set) => ({
@@ -76,30 +76,29 @@ export const useFiltrosStore = create<FiltrosState>((set) => ({
   rotacion: '',
   recomendacion: null,
   orden: 'ven',
-  limiteTabla: LIMITE_TABLA,
   modoRanking: 'repo',
   alcanceRanking: 'all',
-  limiteRanking: LIMITE_RANKING,
   moneda: 1,
   alcancePrecios: 'lista',
   ordenPrecios: 'un',
   volumenMin: 0,
-  limitePrecios: LIMITE_PRECIOS,
+  ...RESET_PAGINAS,
 
-  setQ: (q) => set({ q, ...RESET_LIMITES }),
-  setUnidad: (unidad) => set({ unidad, ...RESET_LIMITES }),
-  setSubRubro: (subRubro) => set({ subRubro, ...RESET_LIMITES }),
-  setRotacion: (rotacion) => set({ rotacion, ...RESET_LIMITES }),
+  setQ: (q) => set({ q, ...RESET_PAGINAS }),
+  setUnidad: (unidad) => set({ unidad, ...RESET_PAGINAS }),
+  setSubRubro: (subRubro) => set({ subRubro, ...RESET_PAGINAS }),
+  setRotacion: (rotacion) => set({ rotacion, ...RESET_PAGINAS }),
   toggleRecomendacion: (r) =>
-    set((s) => ({ recomendacion: s.recomendacion === r ? null : r, limiteTabla: LIMITE_TABLA })),
-  setOrden: (orden) => set({ orden, limiteTabla: LIMITE_TABLA }),
-  verMasTabla: () => set((s) => ({ limiteTabla: s.limiteTabla + 200 })),
-  setModoRanking: (modoRanking) => set({ modoRanking, limiteRanking: LIMITE_RANKING }),
-  setAlcanceRanking: (alcanceRanking) => set({ alcanceRanking, limiteRanking: LIMITE_RANKING }),
-  verMasRanking: () => set((s) => ({ limiteRanking: s.limiteRanking + 40 })),
-  setMoneda: (moneda) => set({ moneda, limitePrecios: LIMITE_PRECIOS }),
-  setAlcancePrecios: (alcancePrecios) => set({ alcancePrecios, limitePrecios: LIMITE_PRECIOS }),
-  setOrdenPrecios: (ordenPrecios) => set({ ordenPrecios, limitePrecios: LIMITE_PRECIOS }),
-  setVolumenMin: (volumenMin) => set({ volumenMin, limitePrecios: LIMITE_PRECIOS }),
-  verMasPrecios: () => set((s) => ({ limitePrecios: s.limitePrecios + 200 })),
+    set((s) => ({ recomendacion: s.recomendacion === r ? null : r, paginaTabla: 1 })),
+  setOrden: (orden) => set({ orden, paginaTabla: 1 }),
+  setPaginaTabla: (paginaTabla) => set({ paginaTabla }),
+  setModoRanking: (modoRanking) => set({ modoRanking, paginaRanking: 1 }),
+  setAlcanceRanking: (alcanceRanking) => set({ alcanceRanking, paginaRanking: 1 }),
+  setPaginaRanking: (paginaRanking) => set({ paginaRanking }),
+  setMoneda: (moneda) => set({ moneda, paginaPrecios: 1 }),
+  setAlcancePrecios: (alcancePrecios) => set({ alcancePrecios, paginaPrecios: 1 }),
+  setOrdenPrecios: (ordenPrecios) => set({ ordenPrecios, paginaPrecios: 1 }),
+  setVolumenMin: (volumenMin) => set({ volumenMin, paginaPrecios: 1 }),
+  setPaginaPrecios: (paginaPrecios) => set({ paginaPrecios }),
+  setPaginaTendencias: (paginaTendencias) => set({ paginaTendencias }),
 }));

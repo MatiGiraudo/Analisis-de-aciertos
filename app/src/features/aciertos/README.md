@@ -26,4 +26,5 @@ pages/VistaAciertos.tsx   Orquesta dataset + filtros + paginación + estado del 
 - Los chips ocultan las categorías sin filas y togglean el filtro de recomendación.
 - La columna *Compras* muestra `*` cuando hay unidades compradas que no ingresaron
   al stock (`disponible − ventas − stockHoy > 0`).
-- Paginación incremental ("Ver más") vía el store de filtros.
+- Paginación (50 telas por página) con el componente compartido `shared/ui/Paginacion`;
+  cambiar un filtro u orden vuelve a la página 1.

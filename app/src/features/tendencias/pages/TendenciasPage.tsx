@@ -10,13 +10,16 @@ import { BarraFiltros } from '@/features/aciertos/ui/BarraFiltros';
 import { useCatalogoStore } from '@/features/catalogo/store/useCatalogoStore';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
 import { formatearCobertura, formatearEntero, formatearPorcentaje } from '@/shared/formato/numeros';
+import { paginar } from '@/shared/logic/paginar';
+import { Paginacion } from '@/shared/ui/Paginacion';
 import { Segmento } from '@/shared/ui/Segmento';
 import { agruparPorColor, PARTICIPACION_RELEVANTE } from '../logic/agruparPorColor';
 import type { AlcanceTendencia, ColorTendencia, OrdenTendencia } from '../logic/agruparPorColor';
 import { UMBRAL_FRENA, UMBRAL_TIRA } from '../ui/IndiceTendencia';
 import { TablaColores } from '../ui/TablaColores';
 
-const LIMITE = 60;
+const COLORES_POR_PAGINA = 30;
+const ANCLA = 'tabla-tendencias';
 
 export function TendenciasPage() {
   const catalogo = useCatalogoStore((s) => s.catalogo);
@@ -25,7 +28,8 @@ export function TendenciasPage() {
   const subRubro = useFiltrosStore((s) => s.subRubro);
   const [orden, setOrden] = useState<OrdenTendencia>('ventas');
   const [alcance, setAlcance] = useState<AlcanceTendencia>('relevantes');
-  const [limite, setLimite] = useState(LIMITE);
+  const paginaActual = useFiltrosStore((s) => s.paginaTendencias);
+  const setPagina = useFiltrosStore((s) => s.setPaginaTendencias);
   const [abiertos, setAbiertos] = useState<ReadonlySet<string>>(new Set());
 
   const filas = useMemo(
@@ -35,8 +39,7 @@ export function TendenciasPage() {
 
   if (!catalogo) return null;
 
-  const mostradas = filas.slice(0, limite);
-  const restantes = filas.length - mostradas.length;
+  const pagina = paginar(filas, paginaActual, COLORES_POR_PAGINA);
   const clave = (c: ColorTendencia) => `${c.color}|${c.unidad}`;
   const alternar = (c: ColorTendencia) =>
     setAbiertos((prev) => {
@@ -58,7 +61,7 @@ export function TendenciasPage() {
           valor={orden}
           onChange={(v) => {
             setOrden(v as OrdenTendencia);
-            setLimite(LIMITE);
+            setPagina(1);
           }}
         />
         <Segmento
@@ -70,7 +73,7 @@ export function TendenciasPage() {
           valor={alcance}
           onChange={(v) => {
             setAlcance(v as AlcanceTendencia);
-            setLimite(LIMITE);
+            setPagina(1);
           }}
         />
         <p className="max-w-[60ch] text-[12.5px] text-ink-2">
@@ -81,30 +84,22 @@ export function TendenciasPage() {
         </p>
       </div>
 
-      <div className="my-3">
+      <div id={ANCLA} className="my-3 scroll-mt-4">
         <BarraFiltros
           mostrarOrden={false}
           mostrarRotacion={false}
           placeholder="Buscar color o tela…"
-          conteo={`${formatearEntero(mostradas.length)} de ${formatearEntero(filas.length)} colores`}
+          conteo={`${formatearEntero(filas.length)} colores`}
         />
       </div>
 
       {filas.length === 0 ? (
         <div className="px-2 py-11 text-center text-[14px] text-ink-3">Ningún color coincide con el filtro.</div>
       ) : (
-        <TablaColores filas={mostradas} estaAbierta={(c) => abiertos.has(clave(c))} onAlternar={alternar} />
+        <TablaColores filas={pagina.items} estaAbierta={(c) => abiertos.has(clave(c))} onAlternar={alternar} />
       )}
 
-      {restantes > 0 && (
-        <button
-          type="button"
-          onClick={() => setLimite((l) => l + LIMITE)}
-          className="mt-4 block w-full border border-dashed border-rule bg-panel p-3 text-[13px] text-ink-2 hover:border-ink hover:text-ink"
-        >
-          Ver {formatearEntero(Math.min(LIMITE, restantes))} colores más ({formatearEntero(restantes)} restantes)
-        </button>
-      )}
+      <Paginacion pagina={pagina} sustantivo="colores" onCambiar={setPagina} anclaId={ANCLA} />
     </div>
   );
 }

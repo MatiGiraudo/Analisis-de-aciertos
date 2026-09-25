@@ -13,6 +13,11 @@ import { useCatalogoStore } from '@/features/catalogo/store/useCatalogoStore';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
 import type { AlcancePrecios, OrdenPrecios } from '@/features/catalogo/store/useFiltrosStore';
 import { formatearDinero, formatearEntero, formatearPorcentaje } from '@/shared/formato/numeros';
+import { paginar } from '@/shared/logic/paginar';
+import { Paginacion } from '@/shared/ui/Paginacion';
+
+const FILAS_POR_PAGINA = 50;
+const ANCLA = 'tabla-precios';
 
 const COLS: { clave: OrdenPrecios; label: string; izq?: boolean }[] = [
   { clave: 'name', label: 'Ítem', izq: true },
@@ -48,8 +53,7 @@ export function PreciosPage() {
   if (!catalogo) return null;
 
   const info = MONEDAS[f.moneda];
-  const mostradas = resultado.filas.slice(0, f.limitePrecios);
-  const restantes = resultado.filas.length - mostradas.length;
+  const pagina = paginar(resultado.filas, f.paginaPrecios, FILAS_POR_PAGINA);
   const noun = f.alcancePrecios === 'art' ? 'artículos' : 'telas';
 
   return (
@@ -119,10 +123,9 @@ export function PreciosPage() {
         ))}
       </div>
 
-      <BarraFiltros
-        mostrarOrden={false}
-        conteo={`${formatearEntero(mostradas.length)} de ${formatearEntero(resultado.filas.length)}`}
-      />
+      <div id={ANCLA} className="scroll-mt-4">
+        <BarraFiltros mostrarOrden={false} conteo={`${formatearEntero(resultado.filas.length)} ${noun}`} />
+      </div>
 
       {resultado.filas.length === 0 ? (
         <div className="px-2 py-11 text-center text-[14px] text-ink-3">
@@ -152,7 +155,7 @@ export function PreciosPage() {
               </tr>
             </thead>
             <tbody>
-              {mostradas.map((fila) => (
+              {pagina.items.map((fila) => (
                 <tr key={fila.clave} className="hover:bg-panel">
                   <td className="min-w-[200px] whitespace-normal border-b border-rule-2 px-[9px] py-2 text-left leading-[1.3]">
                     {fila.codigo && <span className="font-mono text-[11.5px] text-ink-3">{fila.codigo}</span>}{' '}
@@ -185,15 +188,7 @@ export function PreciosPage() {
         </div>
       )}
 
-      {restantes > 0 && (
-        <button
-          type="button"
-          onClick={f.verMasPrecios}
-          className="mt-4 block w-full border border-dashed border-rule bg-panel p-3 text-[13px] text-ink-2 hover:border-ink hover:text-ink"
-        >
-          Ver {formatearEntero(Math.min(200, restantes))} filas más ({formatearEntero(restantes)} restantes)
-        </button>
-      )}
+      <Paginacion pagina={pagina} sustantivo={noun} onCambiar={f.setPaginaPrecios} anclaId={ANCLA} />
     </div>
   );
 }
