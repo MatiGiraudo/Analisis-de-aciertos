@@ -1,0 +1,21 @@
+# Datos reales de la empresa (stock, ventas, precios): NO se versionan.
+# La app los carga desde el navegador; los tests de integración se saltean si faltan.
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+Aciertos_de_compra_*.html
+
+# Configuración local de herramientas
+.claude/
+
+# Dependencias y builds
+node_modules/
+dist/
+dist-ssr/
+coverage/
+*.tsbuildinfo
+*.local
+.vite/
+.vercel/
+.env*

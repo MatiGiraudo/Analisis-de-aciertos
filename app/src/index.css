@@ -1,0 +1,52 @@
+/**
+ * Estilos globales y tokens de diseño.
+ *
+ * Portados 1:1 desde `Aciertos_de_compra_9.html` para conservar la estética
+ * editorial (papel, tipografías Archivo / IBM Plex, paleta de recomendaciones).
+ * Los tokens se exponen como variables Tailwind v4 (`@theme`) para poder usarlos
+ * como utilidades (`bg-paper`, `text-ink`, `font-disp`, etc.) y como `var(--...)`.
+ */
+@import 'tailwindcss';
+
+@theme {
+  /* superficies y tinta */
+  --color-paper: #e9ebe6;
+  --color-panel: #f8f9f6;
+  --color-ink: #16181b;
+  --color-ink-2: #4e534e;
+  --color-ink-3: #7c817b;
+  --color-rule: #cdd2c8;
+  --color-rule-2: #dde1d8;
+  --color-cloth: #dce0d6;
+
+  /* colores de recomendación (c0..c4) */
+  --color-rec-aumentar: #1c6e4f;
+  --color-rec-mantener: #2b5c8c;
+  --color-rec-reducir: #b36b12;
+  --color-rec-liquidar: #9e2a2b;
+  --color-rec-revisar: #6b6e68;
+
+  /* tipografías */
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-disp: 'Archivo', 'Archivo Narrow', system-ui, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* números tabulares en tipografía mono, reutilizable */
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
