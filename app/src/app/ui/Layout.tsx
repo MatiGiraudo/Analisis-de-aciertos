@@ -83,6 +83,11 @@ export function Layout() {
               <NavLink to="/precios" className={claseTab}>
                 Precios
               </NavLink>
+              {catalogo.avisos.length > 0 && (
+                <NavLink to="/salvedades" className={claseTab}>
+                  Salvedades ({formatearEntero(catalogo.avisos.length)})
+                </NavLink>
+              )}
             </div>
           </nav>
 

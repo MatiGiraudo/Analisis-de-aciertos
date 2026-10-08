@@ -9,6 +9,7 @@ import { RankingPage } from '@/features/ranking/pages/RankingPage';
 import { PreciosPage } from '@/features/precios/pages/PreciosPage';
 import { TendenciasPage } from '@/features/tendencias/pages/TendenciasPage';
 import { TemporadasPage } from '@/features/temporadas/pages/TemporadasPage';
+import { SalvedadesPage } from '@/features/salvedades/pages/SalvedadesPage';
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       { path: 'articulos', element: <Navigate to="/telas" replace /> },
       { path: 'ranking', element: <RankingPage /> },
       { path: 'precios', element: <PreciosPage /> },
+      { path: 'salvedades', element: <SalvedadesPage /> },
     ],
   },
 ]);

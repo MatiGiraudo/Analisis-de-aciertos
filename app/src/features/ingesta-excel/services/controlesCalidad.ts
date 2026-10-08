@@ -8,7 +8,7 @@
  *  - telas donde no cierra `inicial + compras − ventas = hoy` (ajustes,
  *    devoluciones, ventas fuera de la ventana).
  */
-import type { TelaAnalizada } from '@/features/catalogo/model/tipos';
+import type { Metricas, TelaAnalizada } from '@/features/catalogo/model/tipos';
 import type { Unidad } from '@/shared/tipos/unidad';
 import type { FilaStockArticulo } from './parsearErp';
 
@@ -16,8 +16,18 @@ import type { FilaStockArticulo } from './parsearErp';
 const TOLERANCIA_CANTIDAD = 0.01;
 /** Fracción mínima de códigos comunes idénticos para declarar "misma foto". */
 const UMBRAL_DUPLICADO = 0.98;
-/** Diferencia por tela (en su unidad) a partir de la cual se considera descuadre. */
-const TOLERANCIA_IDENTIDAD = 1;
+/** Diferencia (en la unidad del ítem) a partir de la cual se considera descuadre. */
+export const TOLERANCIA_IDENTIDAD = 1;
+
+/**
+ * Descuadre de la identidad contable de un ítem (tela o artículo):
+ * `hoy − (inicial + compras − ventas)`. Positivo = hay más stock del esperado
+ * (entró algo que no figura como compra); negativo = falta stock (salió algo que
+ * no figura como venta).
+ */
+export function diferenciaIdentidad(m: Pick<Metricas, 'stockInicial' | 'compras' | 'ventas' | 'stockHoy'>): number {
+  return m.stockHoy - (m.stockInicial + m.compras - m.ventas);
+}
 
 /**
  * ¿Las dos fotos de stock por artículo son la misma? Compara los códigos
@@ -60,7 +70,7 @@ export function controlarIdentidad(telas: readonly TelaAnalizada[]): DescuadreUn
   const porUnidad = new Map<Unidad, { telas: number; con: number; dif: number; hoy: number }>();
   for (const t of telas) {
     const acc = porUnidad.get(t.unidad) ?? { telas: 0, con: 0, dif: 0, hoy: 0 };
-    const dif = t.stockHoy - (t.stockInicial + t.compras - t.ventas);
+    const dif = diferenciaIdentidad(t);
     acc.telas++;
     acc.hoy += t.stockHoy;
     acc.dif += dif;

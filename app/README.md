@@ -52,6 +52,7 @@ src/
     precios/        Precios ponderados por moneda
     tendencias/     Colores de tendencia (color × unidad)
     temporadas/     Telas por temporada (verano / invierno / atemporal), filtro global y correcciones
+    salvedades/     Detalle de salvedades: telas y artículos que no cierran inicial + compras − ventas = hoy
   shared/         Transversal: formato numérico, tipos base, UI reutilizable
 ```
 
