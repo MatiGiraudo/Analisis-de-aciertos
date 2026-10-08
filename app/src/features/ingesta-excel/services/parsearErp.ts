@@ -5,7 +5,8 @@
  * export es y devolver filas tipadas. Resuelve las particularidades del ERP:
  *  - ubica las columnas por su ENCABEZADO (no por posición): el mismo reporte
  *    sale a veces desde la columna A y a veces desde la B, y el encabezado puede
- *    ocupar una o dos filas ("Articulo / Código", "Total Cantidad" arriba);
+ *    ocupar una o dos filas ("Articulo / Código", "Total Cantidad" arriba, o
+ *    "Total Existencias" arriba y "Cantidad / Valorizado" debajo);
  *  - descarta encabezados y subtotales ("Total General", "Secciones"…);
  *  - arrastra Rubro y Sub Rubro desde las filas de agrupación hacia el detalle,
  *    y se queda solo con el rubro analizado (TELAS) cuando la hoja lo trae;
@@ -84,7 +85,7 @@ const ETIQUETAS = {
   rubro: ['rubro'],
   subRubro: ['sub rubro'],
   codigo: ['codigo de articulo', 'clave articulo', 'codigo'],
-  descripcion: ['descripcion de articulo', 'nombre articulo', 'descripcion'],
+  descripcion: ['descripcion de articulo', 'nombre articulo', 'descripcion', 'articulo'],
   grupo: ['grupo articulo'],
   unidad: ['nombre unidad'],
   cantidad: ['cant.', 'total cantidad'],
@@ -132,9 +133,20 @@ function ubicarEncabezado(hoja: HojaCruda): Encabezado | undefined {
   return undefined;
 }
 
+/** Totales que el ERP rotula distinto según el reporte; se llevan a "total cantidad". */
+const TOTALES_CANTIDAD = new Set(['total cantidad', 'total existencias']);
+
 function combinarEncabezado(arriba: readonly Celda[] | undefined, fila: readonly Celda[]): string[] {
   const largo = Math.max(arriba?.length ?? 0, fila.length);
-  return Array.from({ length: largo }, (_, j) => normalizar(fila[j]) || normalizar(arriba?.[j]));
+  return Array.from({ length: largo }, (_, j) => {
+    const abajo = normalizar(fila[j]);
+    const sobre = normalizar(arriba?.[j]);
+    // "Total Existencias" con "Cantidad" debajo (o solo) = columna de total en unidades.
+    if (TOTALES_CANTIDAD.has(abajo) || (TOTALES_CANTIDAD.has(sobre) && (!abajo || abajo === 'cantidad'))) {
+      return 'total cantidad';
+    }
+    return abajo || sobre;
+  });
 }
 
 /* ------------------------------------------------------------------ */
