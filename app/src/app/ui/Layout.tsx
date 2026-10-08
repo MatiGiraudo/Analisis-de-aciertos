@@ -71,6 +71,9 @@ export function Layout() {
               <NavLink to="/telas" className={claseTab}>
                 Telas y colores
               </NavLink>
+              <NavLink to="/temporadas" className={claseTab}>
+                Temporadas
+              </NavLink>
               <NavLink to="/tendencias" className={claseTab}>
                 Colores de tendencia
               </NavLink>

@@ -9,7 +9,7 @@ import type { CriteriosPrecios } from '../logic/analizarPrecios';
 import { BarraFiltros } from '@/features/aciertos/ui/BarraFiltros';
 import { MONEDAS } from '@/shared/tipos/moneda';
 import type { Moneda } from '@/shared/tipos/moneda';
-import { useCatalogoStore } from '@/features/catalogo/store/useCatalogoStore';
+import { useCatalogoPorTemporada } from '@/features/temporadas/hooks/useTemporadas';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
 import type { AlcancePrecios, OrdenPrecios } from '@/features/catalogo/store/useFiltrosStore';
 import { formatearDinero, formatearEntero, formatearPorcentaje } from '@/shared/formato/numeros';
@@ -29,7 +29,7 @@ const COLS: { clave: OrdenPrecios; label: string; izq?: boolean }[] = [
 ];
 
 export function PreciosPage() {
-  const catalogo = useCatalogoStore((s) => s.catalogo);
+  const catalogo = useCatalogoPorTemporada();
   const f = useFiltrosStore();
 
   const items = useMemo(() => {

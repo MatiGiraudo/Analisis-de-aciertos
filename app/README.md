@@ -50,6 +50,8 @@ src/
     aciertos/       Vistas Lista / Todas las telas / Artículos
     ranking/        Reponer ya / Plata parada
     precios/        Precios ponderados por moneda
+    tendencias/     Colores de tendencia (color × unidad)
+    temporadas/     Telas por temporada (verano / invierno / atemporal), filtro global y correcciones
   shared/         Transversal: formato numérico, tipos base, UI reutilizable
 ```
 
@@ -59,7 +61,7 @@ el dominio es testeable en aislamiento.
 
 - **SOLID** — SRP por servicio (leer ≠ parsear ≠ agregar ≠ derivar); OCP en las
   reglas de recomendación (tabla de estrategias) y en el reparto de stock
-  (interfaz `EstrategiaReparto`); DIP vía `LectorPlanilla` (abstrae SheetJS) y
+  (interfaz `EstrategiaReparto`); DIP vía `LectorPlanilla` / `EscritorPlanilla` (abstraen SheetJS) y
   los stores.
 - **DRY** — una sola fuente de formato (`shared/formato`), un único pipeline
   `derivar`/`puntajes` reutilizado por todas las vistas.

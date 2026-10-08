@@ -7,7 +7,7 @@
  */
 import { useMemo, useState } from 'react';
 import { BarraFiltros } from '@/features/aciertos/ui/BarraFiltros';
-import { useCatalogoStore } from '@/features/catalogo/store/useCatalogoStore';
+import { useCatalogoPorTemporada } from '@/features/temporadas/hooks/useTemporadas';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
 import { formatearCobertura, formatearEntero, formatearPorcentaje } from '@/shared/formato/numeros';
 import { paginar } from '@/shared/logic/paginar';
@@ -22,7 +22,7 @@ const COLORES_POR_PAGINA = 30;
 const ANCLA = 'tabla-tendencias';
 
 export function TendenciasPage() {
-  const catalogo = useCatalogoStore((s) => s.catalogo);
+  const catalogo = useCatalogoPorTemporada();
   const q = useFiltrosStore((s) => s.q);
   const unidad = useFiltrosStore((s) => s.unidad);
   const subRubro = useFiltrosStore((s) => s.subRubro);

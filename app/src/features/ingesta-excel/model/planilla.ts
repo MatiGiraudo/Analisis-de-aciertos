@@ -39,3 +39,17 @@ export interface ArchivoEntrada {
 export interface LectorPlanilla {
   leer(datos: ArrayBuffer): Promise<PlanillaCruda>;
 }
+
+/** Una hoja a escribir: nombre y filas (la primera suele ser el encabezado). */
+export interface HojaSalida {
+  readonly nombre: string;
+  readonly filas: readonly Celda[][];
+}
+
+/**
+ * Escritor de planillas: arma un libro y lo entrega al usuario como descarga.
+ * Contraparte de `LectorPlanilla` (DIP): las features no conocen SheetJS.
+ */
+export interface EscritorPlanilla {
+  descargar(nombreArchivo: string, hojas: readonly HojaSalida[]): void;
+}

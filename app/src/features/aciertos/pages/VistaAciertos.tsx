@@ -13,7 +13,7 @@ import { BarraFiltros } from '../ui/BarraFiltros';
 import { TablaAciertos } from '../ui/TablaAciertos';
 import { indexarColores, telasConColores } from '../logic/telasConColores';
 import type { TelaConColores } from '../logic/telasConColores';
-import { useCatalogoStore } from '@/features/catalogo/store/useCatalogoStore';
+import { useCatalogoPorTemporada } from '@/features/temporadas/hooks/useTemporadas';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
 import { formatearEntero } from '@/shared/formato/numeros';
 import { paginar } from '@/shared/logic/paginar';
@@ -30,7 +30,7 @@ interface VistaAciertosProps {
 }
 
 export function VistaAciertos({ fuente }: VistaAciertosProps) {
-  const catalogo = useCatalogoStore((s) => s.catalogo);
+  const catalogo = useCatalogoPorTemporada();
   const f = useFiltrosStore();
   /** Estado explícito del acordeón por tela; lo no tocado usa la apertura automática. */
   const [abiertas, setAbiertas] = useState<ReadonlyMap<string, boolean>>(new Map());

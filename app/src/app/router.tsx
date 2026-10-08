@@ -8,6 +8,7 @@ import { VistaAciertos } from '@/features/aciertos/pages/VistaAciertos';
 import { RankingPage } from '@/features/ranking/pages/RankingPage';
 import { PreciosPage } from '@/features/precios/pages/PreciosPage';
 import { TendenciasPage } from '@/features/tendencias/pages/TendenciasPage';
+import { TemporadasPage } from '@/features/temporadas/pages/TemporadasPage';
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <VistaAciertos fuente="lista" /> },
       { path: 'telas', element: <VistaAciertos fuente="telas" /> },
+      { path: 'temporadas', element: <TemporadasPage /> },
       { path: 'tendencias', element: <TendenciasPage /> },
       // "Artículos" se unificó con "Telas" (acordeón de colores): se redirige.
       { path: 'articulos', element: <Navigate to="/telas" replace /> },

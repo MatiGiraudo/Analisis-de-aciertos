@@ -1,5 +1,5 @@
 /**
- * Barra de filtros compartida: búsqueda, unidad, sub rubro, rotación y orden.
+ * Barra de filtros compartida: búsqueda, unidad, sub rubro, temporada, rotación y orden.
  * Escribe en `useFiltrosStore`. Los selectores de orden y rotación se ocultan
  * donde no aplican.
  */
@@ -8,6 +8,8 @@ import { ETIQUETA_ROTACION } from '@/features/catalogo/logic/rotacion';
 import type { Rotacion } from '@/features/catalogo/model/tipos';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
 import type { OrdenTabla } from '@/features/catalogo/store/useFiltrosStore';
+import { ETIQUETA_TEMPORADA } from '@/shared/tipos/temporada';
+import type { FiltroTemporada } from '@/shared/tipos/temporada';
 import type { SubRubro, Unidad } from '@/shared/tipos/unidad';
 
 const ORDENES: { valor: OrdenTabla; texto: string }[] = [
@@ -20,6 +22,8 @@ const ORDENES: { valor: OrdenTabla; texto: string }[] = [
   { valor: 'cob', texto: 'Mayor cobertura' },
   { valor: 'name', texto: 'Alfabético' },
 ];
+
+const OPCIONES_TEMPORADA: readonly Exclude<FiltroTemporada, ''>[] = ['VERANO', 'INVIERNO', 'ATEMPORAL', 'SIN'];
 
 const CLASE_SELECT =
   'border border-rule bg-panel px-[10px] py-2 text-[13px] text-ink focus:outline-2 focus:outline-rec-mantener';
@@ -73,6 +77,20 @@ export function BarraFiltros({
         <option value="">Punto y plano</option>
         <option value="PUNTO">Solo punto</option>
         <option value="PLANO">Solo plano</option>
+      </select>
+
+      <select
+        aria-label="Temporada"
+        className={CLASE_SELECT}
+        value={f.temporada}
+        onChange={(e) => f.setTemporada(e.target.value as FiltroTemporada)}
+      >
+        <option value="">Toda temporada</option>
+        {OPCIONES_TEMPORADA.map((t) => (
+          <option key={t} value={t}>
+            {t === 'SIN' ? 'Sin temporada' : ETIQUETA_TEMPORADA[t]}
+          </option>
+        ))}
       </select>
 
       {mostrarRotacion && (

@@ -9,6 +9,7 @@
 import { create } from 'zustand';
 import type { Recomendacion, Rotacion } from '../model/tipos';
 import type { Moneda } from '@/shared/tipos/moneda';
+import type { FiltroTemporada } from '@/shared/tipos/temporada';
 import type { SubRubro, Unidad } from '@/shared/tipos/unidad';
 
 /** Claves de orden de las tablas de aciertos. */
@@ -26,6 +27,7 @@ interface FiltrosState {
   unidad: Unidad | '';
   subRubro: SubRubro | '';
   rotacion: Rotacion | '';
+  temporada: FiltroTemporada;
   recomendacion: Recomendacion | null;
   // --- tablas de aciertos ---
   orden: OrdenTabla;
@@ -42,11 +44,14 @@ interface FiltrosState {
   paginaPrecios: number;
   // --- colores de tendencia ---
   paginaTendencias: number;
+  // --- temporadas ---
+  paginaTemporadas: number;
 
   setQ: (q: string) => void;
   setUnidad: (u: Unidad | '') => void;
   setSubRubro: (s: SubRubro | '') => void;
   setRotacion: (r: Rotacion | '') => void;
+  setTemporada: (t: FiltroTemporada) => void;
   toggleRecomendacion: (r: Recomendacion) => void;
   setOrden: (o: OrdenTabla) => void;
   setPaginaTabla: (p: number) => void;
@@ -59,6 +64,7 @@ interface FiltrosState {
   setVolumenMin: (v: number) => void;
   setPaginaPrecios: (p: number) => void;
   setPaginaTendencias: (p: number) => void;
+  setPaginaTemporadas: (p: number) => void;
 }
 
 /** Al cambiar un filtro compartido, todas las vistas vuelven a la página 1. */
@@ -67,6 +73,7 @@ const RESET_PAGINAS = {
   paginaRanking: 1,
   paginaPrecios: 1,
   paginaTendencias: 1,
+  paginaTemporadas: 1,
 };
 
 export const useFiltrosStore = create<FiltrosState>((set) => ({
@@ -74,6 +81,7 @@ export const useFiltrosStore = create<FiltrosState>((set) => ({
   unidad: '',
   subRubro: '',
   rotacion: '',
+  temporada: '',
   recomendacion: null,
   orden: 'ven',
   modoRanking: 'repo',
@@ -88,6 +96,7 @@ export const useFiltrosStore = create<FiltrosState>((set) => ({
   setUnidad: (unidad) => set({ unidad, ...RESET_PAGINAS }),
   setSubRubro: (subRubro) => set({ subRubro, ...RESET_PAGINAS }),
   setRotacion: (rotacion) => set({ rotacion, ...RESET_PAGINAS }),
+  setTemporada: (temporada) => set({ temporada, ...RESET_PAGINAS }),
   toggleRecomendacion: (r) =>
     set((s) => ({ recomendacion: s.recomendacion === r ? null : r, paginaTabla: 1 })),
   setOrden: (orden) => set({ orden, paginaTabla: 1 }),
@@ -101,4 +110,5 @@ export const useFiltrosStore = create<FiltrosState>((set) => ({
   setVolumenMin: (volumenMin) => set({ volumenMin, paginaPrecios: 1 }),
   setPaginaPrecios: (paginaPrecios) => set({ paginaPrecios }),
   setPaginaTendencias: (paginaTendencias) => set({ paginaTendencias }),
+  setPaginaTemporadas: (paginaTemporadas) => set({ paginaTemporadas }),
 }));

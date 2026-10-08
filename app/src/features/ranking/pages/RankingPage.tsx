@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 import { rankearTelas, EXPLICACION_RANKING } from '../logic/rankear';
 import { FilaRankingTela } from '../ui/FilaRankingTela';
 import { BarraFiltros } from '@/features/aciertos/ui/BarraFiltros';
-import { useCatalogoStore } from '@/features/catalogo/store/useCatalogoStore';
+import { useCatalogoPorTemporada } from '@/features/temporadas/hooks/useTemporadas';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
 import { formatearEntero } from '@/shared/formato/numeros';
 import { paginar } from '@/shared/logic/paginar';
@@ -20,7 +20,7 @@ const TELAS_POR_PAGINA = 25;
 const ANCLA = 'lista-ranking';
 
 export function RankingPage() {
-  const catalogo = useCatalogoStore((s) => s.catalogo);
+  const catalogo = useCatalogoPorTemporada();
   const f = useFiltrosStore();
   /** Estado explícito del acordeón por tela; lo no tocado usa la apertura automática. */
   const [abiertas, setAbiertas] = useState<ReadonlyMap<string, boolean>>(new Map());

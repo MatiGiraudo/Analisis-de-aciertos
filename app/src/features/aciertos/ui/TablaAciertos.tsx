@@ -17,6 +17,9 @@ import type { FilaAciertos } from '../logic/filtrarOrdenar';
 import type { CampoEstimado } from '@/features/catalogo/model/tipos';
 import { INFO_RECOMENDACION } from '@/features/catalogo/logic/recomendacion';
 import { useFiltrosStore } from '@/features/catalogo/store/useFiltrosStore';
+import { useTemporadaDe } from '@/features/temporadas/hooks/useTemporadas';
+import { EtiquetaTemporada } from '@/features/temporadas/ui/EtiquetaTemporada';
+import type { Temporada } from '@/shared/tipos/temporada';
 import type { OrdenTabla } from '@/features/catalogo/store/useFiltrosStore';
 import { Badge } from '@/shared/ui/Badge';
 import { BarraSellThrough } from '@/shared/ui/BarraSellThrough';
@@ -58,6 +61,7 @@ interface TablaAciertosProps {
 export function TablaAciertos({ filas, estaAbierta, onAlternar }: TablaAciertosProps) {
   const orden = useFiltrosStore((s) => s.orden);
   const setOrden = useFiltrosStore((s) => s.setOrden);
+  const temporadaDe = useTemporadaDe();
 
   const alClickHeader = (clave: OrdenTabla) => {
     if (clave === 'st') setOrden(orden === 'st' ? 'st_asc' : 'st');
@@ -94,7 +98,12 @@ export function TablaAciertos({ filas, estaAbierta, onAlternar }: TablaAciertosP
             const abierta = estaAbierta(f);
             return (
               <Fragment key={f.tela.nombre}>
-                <FilaTabla fila={f.tela} abierta={abierta} onAlternar={() => onAlternar(f)} />
+                <FilaTabla
+                  fila={f.tela}
+                  temporada={temporadaDe(f.tela.nombre)}
+                  abierta={abierta}
+                  onAlternar={() => onAlternar(f)}
+                />
                 {abierta && f.colores.map((a) => <FilaTabla key={a.codigo} fila={a} />)}
               </Fragment>
             );
@@ -109,6 +118,8 @@ export function TablaAciertos({ filas, estaAbierta, onAlternar }: TablaAciertosP
 
 interface FilaTablaProps {
   readonly fila: FilaAciertos;
+  /** Solo filas de tela: temporada asignada (null = sin asignar). */
+  readonly temporada?: Temporada | null;
   /** Solo filas de tela: estado y acción del acordeón. */
   readonly abierta?: boolean;
   readonly onAlternar?: () => void;
@@ -116,7 +127,7 @@ interface FilaTablaProps {
 
 const TD = 'px-[9px] py-2 border-b border-rule-2 text-right tabular text-[13px] whitespace-nowrap';
 
-function FilaTabla({ fila, abierta = false, onAlternar }: FilaTablaProps) {
+function FilaTabla({ fila, temporada = null, abierta = false, onAlternar }: FilaTablaProps) {
   const info = INFO_RECOMENDACION[fila.recomendacion];
   const gap = fila.disponible - fila.ventas - fila.stockHoy;
   const flag = gap > 0.5;
@@ -159,8 +170,9 @@ function FilaTabla({ fila, abierta = false, onAlternar }: FilaTablaProps) {
             <span>
               {fila.nombre}
               {fila.enLista && <span className="ml-1 text-[11px] text-rec-mantener">★</span>}
-              <span className="block text-[11px] uppercase tracking-[0.04em] text-ink-3">
+              <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] uppercase tracking-[0.04em] text-ink-3">
                 {fila.subRubro || '—'} · {fila.unidad}
+                <EtiquetaTemporada temporada={temporada} />
               </span>
             </span>
           </span>
